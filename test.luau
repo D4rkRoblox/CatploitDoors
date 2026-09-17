@@ -2686,7 +2686,7 @@ end)
 
 Groupboxes.Exploits_BypassRight:AddDivider()
 Groupboxes.Exploits_BypassRight:AddToggle("Godmode", {
-	Text = "Position Spoof", Default = false,
+	Text = "Godmode", Default = false,
 	Tooltip = "Makes your character appear underground on the server, protecting you from rush-like entities.(Godmode)"
 })
 Groupboxes.Exploits_BypassRight:AddToggle("CrouchSpoof", {
@@ -2705,7 +2705,7 @@ Toggles.Godmode:OnChanged(function(Value)
 	end
 end)
 Toggles.Godmode:AddKeyPicker("Godmode", {
-	Text = "Position Spoof", Default = "B", Mode = "Toggle", SyncToggleState = true
+	Text = "Godmode", Default = "B", Mode = "Toggle", SyncToggleState = true
 })
 Toggles.CrouchSpoof:OnChanged(function(Value)
 	if RemotesFolder:FindFirstChild("Crouch") then
