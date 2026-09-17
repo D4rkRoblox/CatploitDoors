@@ -2242,7 +2242,7 @@ Toggles.ForgetMeNotSolver:OnChanged(function(Value)
 end)
 Toggles.BypassWater:OnChanged(function(Value)
 
-	Functions.Notify({Title = "PositionSpoof Will Break This!."})
+	Functions.Notify({Title = "Godmode Will Break This!."})
 
 	if WaterBypassConnection then
 		WaterBypassConnection:Disconnect()
@@ -2685,14 +2685,14 @@ end)
 
 
 Groupboxes.Exploits_BypassRight:AddDivider()
-Groupboxes.Exploits_BypassRight:AddToggle("PositionSpoof", {
-	Text = "Position Spoof", Default = false,
-	Tooltip = "Makes your character appear underground on the server, protecting you from rush-like entities."
+Groupboxes.Exploits_BypassRight:AddToggle("Godmode", {
+	Text = "Godmode", Default = false,
+	Tooltip = "Makes your character appear underground on the server, protecting you from rush-like entities.(Godmode)"
 })
 Groupboxes.Exploits_BypassRight:AddToggle("CrouchSpoof", {
 	Text = "Crouch Spoof", Default = false, Tooltip = "Makes the game think you are always crouching."
 })
-Toggles.PositionSpoof:OnChanged(function(Value)
+Toggles.Godmode:OnChanged(function(Value)
 	if Floor ~= "Fools" and Floor ~= "OldHotel" then
 		if Value then
 			RootPart.CFrame = RootPart.CFrame * CFrame.new(0, -2.346, 0)
@@ -2704,8 +2704,8 @@ Toggles.PositionSpoof:OnChanged(function(Value)
 		end
 	end
 end)
-Toggles.PositionSpoof:AddKeyPicker("PositionSpoof", {
-	Text = "Position Spoof", Default = "B", Mode = "Toggle", SyncToggleState = true
+Toggles.Godmode:AddKeyPicker("Godmode", {
+	Text = "Godmode", Default = "B", Mode = "Toggle", SyncToggleState = true
 })
 Toggles.CrouchSpoof:OnChanged(function(Value)
 	if RemotesFolder:FindFirstChild("Crouch") then
@@ -3441,8 +3441,8 @@ Connections.RoomsAutoWalkHandler = Services.RunService.Heartbeat:Connect(functio
 		AgentRadius = 1.5, AgentHeight = 1.5, Costs = { StuckPart = 8 }
 	})
 
-	if Toggles.RoomsAutoWalkIgnoreA60.Value and not Toggles.PositionSpoof.Value then
-		Toggles.PositionSpoof:SetValue(true)
+	if Toggles.RoomsAutoWalkIgnoreA60.Value and not Toggles.Godmode.Value then
+		Toggles.Godmode:SetValue(true)
 	end
 
 	local TargetPart = Functions.RoomsAutoWalk.GetPathfindTarget()
@@ -3857,7 +3857,7 @@ if Functions.CheckCompatability({"hookmetamethod", "newcclosure", "getnamecallme
 			local Method = Abysall.Environment.getnamecallmethod()
 
 			if Self.Name == "Crouch" and Method == "FireServer" then
-				if Toggles.CrouchSpoof.Value or Toggles.PositionSpoof.Value then
+				if Toggles.CrouchSpoof.Value or Toggles.Godmode.Value then
 					Args[1] = true
 				end
 				Args[2] = true
@@ -4358,7 +4358,7 @@ Functions.HandleCharacter = function(NewCharacter)
 			end
 		end
 
-		if (Toggles.CrouchSpoof.Value or Toggles.PositionSpoof.Value) and RemotesFolder:FindFirstChild("Crouch") then
+		if (Toggles.CrouchSpoof.Value or Toggles.Godmode.Value) and RemotesFolder:FindFirstChild("Crouch") then
 			RemotesFolder.Crouch:FireServer(true, true)
 		end
 
@@ -4375,7 +4375,7 @@ Functions.HandleCharacter = function(NewCharacter)
 		end
 
 		if Floor == "OldHotel" or Floor == "Fools" then
-			local SpoofOffset = Toggles.PositionSpoof.Value and Functions.GetNearestEntity() and 200 or Toggles.FigureGodmode.Value and Functions.GetNearestFigure() and 200 or 0
+			local SpoofOffset = Toggles.Godmode.Value and Functions.GetNearestEntity() and 200 or Toggles.FigureGodmode.Value and Functions.GetNearestFigure() and 200 or 0
 			Globals.SpoofOffset = SpoofOffset
 			Collision.Position = RootPart.Position + Vector3.new(0, SpoofOffset, 0)
 			Collision.CanCollide = false
@@ -4397,25 +4397,25 @@ Functions.HandleCharacter = function(NewCharacter)
 			end
 
 			if Character:FindFirstChild("LowerTorso") and Character.LowerTorso:FindFirstChild("Root") then
-				Character.LowerTorso.Root.C1 = Globals.OriginalC1 * CFrame.new(0, Toggles.PositionSpoof.Value and -2.346 or 0, 0)
+				Character.LowerTorso.Root.C1 = Globals.OriginalC1 * CFrame.new(0, Toggles.Godmode.Value and -2.346 or 0, 0)
 			end
 
-			local SpoofY = Toggles.PositionSpoof.Value and 2.328 or 0.18
+			local SpoofY = Toggles.Godmode.Value and 2.328 or 0.18
 			Collision.Position     = RootPart.Position + Vector3.new(0, SpoofY, 0)
 			CollisionPart.Position = RootPart.Position + Vector3.new(0, SpoofY, 0)
 
 			if Collision:FindFirstChild("CollisionCrouch") and CollisionClone:FindFirstChild("CollisionCrouch") then
-				local CrouchY = Toggles.PositionSpoof.Value and 1.328 or -0.982
+				local CrouchY = Toggles.Godmode.Value and 1.328 or -0.982
 				Collision.CollisionCrouch.Position = RootPart.Position + Vector3.new(0, CrouchY, 0)
 				CollisionClone.CollisionCrouch.CollisionGroup = Collision.CollisionCrouch.CollisionGroup
 			end
 			if CollisionClone:FindFirstChild("CollisionCrouch") then
-				CollisionClone.CollisionCrouch.Position = RootPart.Position + Vector3.new(0, Toggles.PositionSpoof.Value and 0.75 or -0.982, 0)
+				CollisionClone.CollisionCrouch.Position = RootPart.Position + Vector3.new(0, Toggles.Godmode.Value and 0.75 or -0.982, 0)
 			end
 		end
 
 		CollisionClone.CollisionGroup = Collision.CollisionGroup
-		CollisionClone.Position = RootPart.Position + Vector3.new(0, Toggles.PositionSpoof.Value and 1.75 or 0.18, 0)
+		CollisionClone.Position = RootPart.Position + Vector3.new(0, Toggles.Godmode.Value and 1.75 or 0.18, 0)
 
 		if Toggles.VelocityManipulationToggle.Value and Options.VelocityManipulationMode.Value == "Velocity" then
 			Globals.ManipulateBody.Parent = RootPart
@@ -4446,7 +4446,7 @@ Functions.HandleCharacter = function(NewCharacter)
 
 		if RemotesFolder:FindFirstChild("Crouch") and tick() - Globals.LastCrouchFire > 0.1 then
 			local IsCrouch = Functions.IsCrouching()
-			if Toggles.CrouchSpoof.Value or Toggles.PositionSpoof.Value then IsCrouch = true end
+			if Toggles.CrouchSpoof.Value or Toggles.Godmode.Value then IsCrouch = true end
 			RemotesFolder.Crouch:FireServer(IsCrouch, true)
 			Globals.LastCrouchFire = tick()
 		end
@@ -4534,7 +4534,7 @@ Functions.HandleCharacter = function(NewCharacter)
 	end)
 
 	task.wait(1)
-	if Toggles.PositionSpoof.Value and Floor ~= "Fools" and Floor ~= "OldHotel" then
+	if Toggles.Godmode.Value and Floor ~= "Fools" and Floor ~= "OldHotel" then
 		RootPart.CFrame = RootPart.CFrame * CFrame.new(0, -2.346, 0)
 		Humanoid.HipHeight = 0.05
 		RemotesFolder.Crouch:FireServer(true, true)
