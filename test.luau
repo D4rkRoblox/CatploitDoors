@@ -1,3 +1,4 @@
+```
 --	Functions.Notify({Title = "Used For Notifications."})
 
 local LoadStart = tick()
@@ -745,7 +746,7 @@ end
 
 if not LocalPlayer.Character or not CurrentRooms:FindFirstChildOfClass("Model") then
 	Functions.Notify({ Title = "Waiting for the game to load..." })
-	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/D4rkRoblox/CatploitDoors/refs/heads/main/test.luau"))()]])
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/therealcookiemonsterof1966/AbysallContinued/main/Games/Doors/Main.luau"))()]])
 	while not LocalPlayer.Character or not CurrentRooms:FindFirstChildOfClass("Model") do
 		task.wait()
 	end
@@ -1213,8 +1214,8 @@ Functions.GetRandomCode = function()
 end
 
 local Window = Library:CreateWindow({
-	Title = "Catploit",
-	Footer = "https://discord.gg/mptxddYcp",
+	Title = "Abysall Hub Continued",
+	Footer = "dsc.gg/abysallhubcontinued",
 	NotifySide = "Right",
 	ShowCustomCursor = false,
 	AutoShow = true,
@@ -1231,13 +1232,19 @@ local Window = Library:CreateWindow({
 
 
 
+
+
+
+
+Abysall.Interface.ApplyInfoTab(Window)
+
 local Tabs = {
 	General  = Window:AddTab("General", "house"),
 	Exploits = Window:AddTab("Exploits", "shield"),
 	Visuals  = Window:AddTab("Visuals", "eye"),
 	Floors   = Window:AddTab("Floors", "earth"),
-	Archives  = Window:AddTab("Archives", "rbxassetid://104508835882225"),
-	Stairwell = Window:AddTab("Stairwell", "rbxassetid://80017304328364"),
+	Archives  = Window:AddTab("New - Archives", "rbxassetid://104508835882225"),
+	Stairwell = Window:AddTab("New - Stairwell", "rbxassetid://80017304328364"),
 }
 
 Groupboxes.General_Character = Tabs.General:AddLeftGroupbox("Character")
@@ -2242,7 +2249,7 @@ Toggles.ForgetMeNotSolver:OnChanged(function(Value)
 end)
 Toggles.BypassWater:OnChanged(function(Value)
 
-	Functions.Notify({Title = "Godmode Will Break This!."})
+	Functions.Notify({Title = "PositionSpoof Will Break This!."})
 
 	if WaterBypassConnection then
 		WaterBypassConnection:Disconnect()
@@ -2452,30 +2459,73 @@ end)
 
 Groupboxes.Stairwell_Misc = Tabs.Stairwell:AddLeftGroupbox("Exploits / Anti")
 Groupboxes.Stairwell_Experimental = Tabs.Stairwell:AddLeftGroupbox("Experimental")
-Groupboxes.Stairwell_Experimental:AddButton({
-    Text = "Bring Dropped Items",
-    Func = function()
-        local workspaceDropsFolder = workspace:FindFirstChild("Drops")
+local function BringAllDroppedItems()
+    local workspaceDropsFolder = workspace:FindFirstChild("Drops")
 
-        if LocalPlayer and LocalPlayer.Character then
-            local playerHumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            
-            if playerHumanoidRootPart then
-                if workspaceDropsFolder then
-                    for _, itemToBring in ipairs(workspaceDropsFolder:GetChildren()) do
-                        if itemToBring:IsA("Model") then
-                            itemToBring:PivotTo(playerHumanoidRootPart.CFrame)
-                        elseif itemToBring:IsA("BasePart") then
-                            itemToBring.CFrame = playerHumanoidRootPart.CFrame
-                        end
-                    end
+    if LocalPlayer and LocalPlayer.Character then
+        local playerHumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if playerHumanoidRootPart and workspaceDropsFolder then
+            for _, itemToBring in ipairs(workspaceDropsFolder:GetChildren()) do
+                if itemToBring:IsA("Model") then
+                    itemToBring:PivotTo(playerHumanoidRootPart.CFrame)
+                elseif itemToBring:IsA("BasePart") then
+                    itemToBring.CFrame = playerHumanoidRootPart.CFrame
                 end
             end
         end
+    end
+end
+
+Groupboxes.Stairwell_Experimental:AddButton({
+    Text = "Bring Dropped Items",
+    Func = function()
+        BringAllDroppedItems()
     end,
     DoubleClick = false,
     Tooltip = "Brings all dropped items."
 })
+
+Groupboxes.Stairwell_Experimental:AddToggle("AutoBringDroppedItems", {
+    Text = "Auto Bring Dropped Items",
+    Default = false,
+    Tooltip = "Automatically brings all dropped items at the selected interval."
+})
+
+Groupboxes.Stairwell_Experimental:AddSlider("BringDroppedItemsInterval", {
+    Text = "Bring Items Interval",
+    Default = 5,
+    Min = 1,
+    Max = 60,
+    Rounding = 0,
+    Compact = false,
+    Suffix = "s"
+})
+
+local AutoBringDroppedItemsRunning = false
+
+Toggles.AutoBringDroppedItems:OnChanged(function(enabled)
+    if not enabled or AutoBringDroppedItemsRunning then
+        return
+    end
+
+    AutoBringDroppedItemsRunning = true
+
+    task.spawn(function()
+        while Toggles.AutoBringDroppedItems.Value do
+            BringAllDroppedItems()
+
+            local interval = 5
+            if Options.BringDroppedItemsInterval then
+                interval = math.clamp(Options.BringDroppedItemsInterval.Value, 1, 60)
+            end
+
+            task.wait(interval)
+        end
+
+        AutoBringDroppedItemsRunning = false
+    end)
+end)
 
 Groupboxes.Stairwell_Experimental:AddToggle("AntiNoise", { Text = "Anti Noise", Default = false, Tooltip = "Prevents the game from making noise when moving (Visual studio auto ai lmfao ✌)." })
 
@@ -2685,14 +2735,14 @@ end)
 
 
 Groupboxes.Exploits_BypassRight:AddDivider()
-Groupboxes.Exploits_BypassRight:AddToggle("Godmode", {
-	Text = "Godmode", Default = false,
-	Tooltip = "Makes your character appear underground on the server, protecting you from rush-like entities.(Godmode)"
+Groupboxes.Exploits_BypassRight:AddToggle("PositionSpoof", {
+	Text = "Position Spoof", Default = false,
+	Tooltip = "Makes your character appear underground on the server, protecting you from rush-like entities."
 })
 Groupboxes.Exploits_BypassRight:AddToggle("CrouchSpoof", {
 	Text = "Crouch Spoof", Default = false, Tooltip = "Makes the game think you are always crouching."
 })
-Toggles.Godmode:OnChanged(function(Value)
+Toggles.PositionSpoof:OnChanged(function(Value)
 	if Floor ~= "Fools" and Floor ~= "OldHotel" then
 		if Value then
 			RootPart.CFrame = RootPart.CFrame * CFrame.new(0, -2.346, 0)
@@ -2704,8 +2754,8 @@ Toggles.Godmode:OnChanged(function(Value)
 		end
 	end
 end)
-Toggles.Godmode:AddKeyPicker("Godmode", {
-	Text = "Godmode", Default = "B", Mode = "Toggle", SyncToggleState = true
+Toggles.PositionSpoof:AddKeyPicker("PositionSpoof", {
+	Text = "Position Spoof", Default = "B", Mode = "Toggle", SyncToggleState = true
 })
 Toggles.CrouchSpoof:OnChanged(function(Value)
 	if RemotesFolder:FindFirstChild("Crouch") then
@@ -3441,8 +3491,8 @@ Connections.RoomsAutoWalkHandler = Services.RunService.Heartbeat:Connect(functio
 		AgentRadius = 1.5, AgentHeight = 1.5, Costs = { StuckPart = 8 }
 	})
 
-	if Toggles.RoomsAutoWalkIgnoreA60.Value and not Toggles.Godmode.Value then
-		Toggles.Godmode:SetValue(true)
+	if Toggles.RoomsAutoWalkIgnoreA60.Value and not Toggles.PositionSpoof.Value then
+		Toggles.PositionSpoof:SetValue(true)
 	end
 
 	local TargetPart = Functions.RoomsAutoWalk.GetPathfindTarget()
@@ -3857,7 +3907,7 @@ if Functions.CheckCompatability({"hookmetamethod", "newcclosure", "getnamecallme
 			local Method = Abysall.Environment.getnamecallmethod()
 
 			if Self.Name == "Crouch" and Method == "FireServer" then
-				if Toggles.CrouchSpoof.Value or Toggles.Godmode.Value then
+				if Toggles.CrouchSpoof.Value or Toggles.PositionSpoof.Value then
 					Args[1] = true
 				end
 				Args[2] = true
@@ -4358,7 +4408,7 @@ Functions.HandleCharacter = function(NewCharacter)
 			end
 		end
 
-		if (Toggles.CrouchSpoof.Value or Toggles.Godmode.Value) and RemotesFolder:FindFirstChild("Crouch") then
+		if (Toggles.CrouchSpoof.Value or Toggles.PositionSpoof.Value) and RemotesFolder:FindFirstChild("Crouch") then
 			RemotesFolder.Crouch:FireServer(true, true)
 		end
 
@@ -4375,7 +4425,7 @@ Functions.HandleCharacter = function(NewCharacter)
 		end
 
 		if Floor == "OldHotel" or Floor == "Fools" then
-			local SpoofOffset = Toggles.Godmode.Value and Functions.GetNearestEntity() and 200 or Toggles.FigureGodmode.Value and Functions.GetNearestFigure() and 200 or 0
+			local SpoofOffset = Toggles.PositionSpoof.Value and Functions.GetNearestEntity() and 200 or Toggles.FigureGodmode.Value and Functions.GetNearestFigure() and 200 or 0
 			Globals.SpoofOffset = SpoofOffset
 			Collision.Position = RootPart.Position + Vector3.new(0, SpoofOffset, 0)
 			Collision.CanCollide = false
@@ -4397,25 +4447,25 @@ Functions.HandleCharacter = function(NewCharacter)
 			end
 
 			if Character:FindFirstChild("LowerTorso") and Character.LowerTorso:FindFirstChild("Root") then
-				Character.LowerTorso.Root.C1 = Globals.OriginalC1 * CFrame.new(0, Toggles.Godmode.Value and -2.346 or 0, 0)
+				Character.LowerTorso.Root.C1 = Globals.OriginalC1 * CFrame.new(0, Toggles.PositionSpoof.Value and -2.346 or 0, 0)
 			end
 
-			local SpoofY = Toggles.Godmode.Value and 2.328 or 0.18
+			local SpoofY = Toggles.PositionSpoof.Value and 2.328 or 0.18
 			Collision.Position     = RootPart.Position + Vector3.new(0, SpoofY, 0)
 			CollisionPart.Position = RootPart.Position + Vector3.new(0, SpoofY, 0)
 
 			if Collision:FindFirstChild("CollisionCrouch") and CollisionClone:FindFirstChild("CollisionCrouch") then
-				local CrouchY = Toggles.Godmode.Value and 1.328 or -0.982
+				local CrouchY = Toggles.PositionSpoof.Value and 1.328 or -0.982
 				Collision.CollisionCrouch.Position = RootPart.Position + Vector3.new(0, CrouchY, 0)
 				CollisionClone.CollisionCrouch.CollisionGroup = Collision.CollisionCrouch.CollisionGroup
 			end
 			if CollisionClone:FindFirstChild("CollisionCrouch") then
-				CollisionClone.CollisionCrouch.Position = RootPart.Position + Vector3.new(0, Toggles.Godmode.Value and 0.75 or -0.982, 0)
+				CollisionClone.CollisionCrouch.Position = RootPart.Position + Vector3.new(0, Toggles.PositionSpoof.Value and 0.75 or -0.982, 0)
 			end
 		end
 
 		CollisionClone.CollisionGroup = Collision.CollisionGroup
-		CollisionClone.Position = RootPart.Position + Vector3.new(0, Toggles.Godmode.Value and 1.75 or 0.18, 0)
+		CollisionClone.Position = RootPart.Position + Vector3.new(0, Toggles.PositionSpoof.Value and 1.75 or 0.18, 0)
 
 		if Toggles.VelocityManipulationToggle.Value and Options.VelocityManipulationMode.Value == "Velocity" then
 			Globals.ManipulateBody.Parent = RootPart
@@ -4446,7 +4496,7 @@ Functions.HandleCharacter = function(NewCharacter)
 
 		if RemotesFolder:FindFirstChild("Crouch") and tick() - Globals.LastCrouchFire > 0.1 then
 			local IsCrouch = Functions.IsCrouching()
-			if Toggles.CrouchSpoof.Value or Toggles.Godmode.Value then IsCrouch = true end
+			if Toggles.CrouchSpoof.Value or Toggles.PositionSpoof.Value then IsCrouch = true end
 			RemotesFolder.Crouch:FireServer(IsCrouch, true)
 			Globals.LastCrouchFire = tick()
 		end
@@ -4534,7 +4584,7 @@ Functions.HandleCharacter = function(NewCharacter)
 	end)
 
 	task.wait(1)
-	if Toggles.Godmode.Value and Floor ~= "Fools" and Floor ~= "OldHotel" then
+	if Toggles.PositionSpoof.Value and Floor ~= "Fools" and Floor ~= "OldHotel" then
 		RootPart.CFrame = RootPart.CFrame * CFrame.new(0, -2.346, 0)
 		Humanoid.HipHeight = 0.05
 		RemotesFolder.Crouch:FireServer(true, true)
@@ -6015,19 +6065,10 @@ Library:OnUnload(function()
 	shared.Hastelepasta = false
 end)
 
-if game.Players.LocalPlayer.Name == "Aihambloxy_123" then
+if game.Players.LocalPlayer.Name == "Robloxiant0g2w2g3q" then
     for i = 1, 10 do
         Functions.Notify({
-            Title = "Hello Gooner"
-        })
-        task.wait()
-    end
-end
-
-if game.Players.LocalPlayer.Name == "RivalsNoob_NoALt" then
-    for i = 1, 10 do
-        Functions.Notify({
-            Title = "Hello Gooner"
+            Title = "Hello again streamer...."
         })
         task.wait()
     end
@@ -6036,3 +6077,4 @@ end
 while not Globals.MainUI do task.wait() end
 Abysall.Interface.ApplySettingsTab(Window)
 Functions.Notify({ Title = "Successfully loaded in " .. math.floor((tick() - LoadStart) * 1000) / 1000 .. " seconds." , Body = "Press '" .. tostring(Options.MenuKeybind.Value) .. "' to toggle the UI."})
+```
