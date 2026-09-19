@@ -15,7 +15,7 @@ getgenv().Abysall = {
     Legit = true
 }
 
-local BaseUrl = "https://raw.githubusercontent.com/D4rkRoblox/CatploitDoors/refs/heads/main/main.luau"
+local BaseUrl = "https://raw.githubusercontent.com/therealcookiemonsterof1966/AbysallContinued/main/"
 
 getgenv().Abysall = {
     Environment = loadstring(game:HttpGet(BaseUrl .. "Components/Environment.luau"))(),
@@ -745,7 +745,7 @@ end
 
 if not LocalPlayer.Character or not CurrentRooms:FindFirstChildOfClass("Model") then
 	Functions.Notify({ Title = "Waiting for the game to load..." })
-	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/D4rkRoblox/CatploitDoors/refs/heads/main/main.luau"))()]])
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/D4rkRoblox/CatploitDoors/refs/heads/main/test.luau"))()]])
 	while not LocalPlayer.Character or not CurrentRooms:FindFirstChildOfClass("Model") do
 		task.wait()
 	end
