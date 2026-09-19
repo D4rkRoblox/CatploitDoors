@@ -1,4 +1,3 @@
-```
 --	Functions.Notify({Title = "Used For Notifications."})
 
 local LoadStart = tick()
@@ -2496,10 +2495,6 @@ Groupboxes.Stairwell_Experimental:AddToggle("AutoBringDroppedItems", {
     Tooltip = "Automatically brings all dropped items."
 })
 
-Options.AutoBringInterval:OnChanged(function(value)
-    AutoBringInterval = math.clamp(tonumber(value) or 5, 1, 60)
-end)
-
 Toggles.AutoBringDroppedItems:OnChanged(function(enabled)
     if not enabled or AutoBringRunning then
         return
@@ -2510,7 +2505,19 @@ Toggles.AutoBringDroppedItems:OnChanged(function(enabled)
     task.spawn(function()
         while Toggles.AutoBringDroppedItems.Value do
             BringAllDroppedItems()
-            task.wait(AutoBringInterval)
+
+            local interval = 5
+            if Options.AutoBringInterval then
+                interval = tonumber(Options.AutoBringInterval.Value) or 5
+            end
+
+            if interval < 1 then
+                interval = 1
+            elseif interval > 60 then
+                interval = 60
+            end
+
+            task.wait(interval)
         end
 
         AutoBringRunning = false
@@ -6076,4 +6083,3 @@ end
 while not Globals.MainUI do task.wait() end
 Abysall.Interface.ApplySettingsTab(Window)
 Functions.Notify({ Title = "Successfully loaded in " .. math.floor((tick() - LoadStart) * 1000) / 1000 .. " seconds." , Body = "Press '" .. tostring(Options.MenuKeybind.Value) .. "' to toggle the UI."})
-```
