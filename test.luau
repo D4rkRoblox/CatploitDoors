@@ -2455,113 +2455,139 @@ Groupboxes.Fun = Tabs.Fun:AddLeftGroupbox("Fun")
 
 local HelikopterTrack = nil
 local HelikopterAnimation = nil
+local HelikopterRunning = false
 
 local function StopHelikopter()
-    if HelikopterTrack then
-        pcall(function()
-            HelikopterTrack:Stop(0.15)
-            HelikopterTrack:Destroy()
-        end)
-        HelikopterTrack = nil
-    end
+	HelikopterRunning = false
 
-    if HelikopterAnimation then
-        pcall(function()
-            HelikopterAnimation:Destroy()
-        end)
-        HelikopterAnimation = nil
-    end
+	if HelikopterTrack then
+		pcall(function()
+			HelikopterTrack:Stop(0.15)
+			HelikopterTrack:Destroy()
+		end)
+		HelikopterTrack = nil
+	end
+
+	if HelikopterAnimation then
+		pcall(function()
+			HelikopterAnimation:Destroy()
+		end)
+		HelikopterAnimation = nil
+	end
+end
+
+local function GetBaseRig()
+	local Camera = workspace:FindFirstChild("Camera")
+	if not Camera then
+		warn("[Catploit] workspace.Camera wurde nicht gefunden.")
+		return nil
+	end
+
+	local BaseRig = Camera:FindFirstChild("BaseRig")
+	if not BaseRig then
+		warn("[Catploit] workspace.Camera.BaseRig wurde nicht gefunden.")
+		return nil
+	end
+
+	return BaseRig
 end
 
 local function PlayHelikopter()
-    StopHelikopter()
+	StopHelikopter()
 
-    local Camera = workspace:FindFirstChild("Camera")
-    if not Camera then
-        warn("[Catploit] workspace.Camera wurde nicht gefunden.")
-        return
-    end
+	local BaseRig = GetBaseRig()
+	if not BaseRig then
+		return
+	end
 
-    local BaseRig = Camera:FindFirstChild("BaseRig")
-    if not BaseRig then
-        warn("[Catploit] workspace.Camera.BaseRig wurde nicht gefunden.")
-        return
-    end
+	local Humanoid = BaseRig:FindFirstChildOfClass("Humanoid")
+	local Animator = nil
 
-    local Humanoid = BaseRig:FindFirstChildOfClass("Humanoid")
-    local Animator = nil
+	if Humanoid then
+		Animator = Humanoid:FindFirstChildOfClass("Animator")
 
-    if Humanoid then
-        Animator = Humanoid:FindFirstChildOfClass("Animator")
+		if not Animator then
+			Animator = Instance.new("Animator")
+			Animator.Parent = Humanoid
+		end
+	else
+		local AnimationController = BaseRig:FindFirstChildOfClass("AnimationController")
 
-        if not Animator then
-            Animator = Instance.new("Animator")
-            Animator.Parent = Humanoid
-        end
-    else
-        local AnimationController = BaseRig:FindFirstChildOfClass("AnimationController")
+		if not AnimationController then
+			AnimationController = Instance.new("AnimationController")
+			AnimationController.Name = "HelikopterController"
+			AnimationController.Parent = BaseRig
+		end
 
-        if not AnimationController then
-            AnimationController = Instance.new("AnimationController")
-            AnimationController.Parent = BaseRig
-        end
+		Animator = AnimationController:FindFirstChildOfClass("Animator")
 
-        Animator = AnimationController:FindFirstChildOfClass("Animator")
+		if not Animator then
+			Animator = Instance.new("Animator")
+			Animator.Parent = AnimationController
+		end
+	end
 
-        if not Animator then
-            Animator = Instance.new("Animator")
-            Animator.Parent = AnimationController
-        end
-    end
+	HelikopterAnimation = Instance.new("Animation")
+	HelikopterAnimation.Name = "HelikopterAnimation"
+	HelikopterAnimation.AnimationId = "rbxassetid://264717068888449"
 
-    HelikopterAnimation = Instance.new("Animation")
-    HelikopterAnimation.Name = "HelikopterAnimation"
-    HelikopterAnimation.AnimationId = "rbxassetid://264717068888449"
+	local Success, Track = pcall(function()
+		return Animator:LoadAnimation(HelikopterAnimation)
+	end)
 
-    local Success, Result = pcall(function()
-        return Animator:LoadAnimation(HelikopterAnimation)
-    end)
+	if not Success or not Track then
+		warn("[Catploit] Helikopter-Animation konnte nicht geladen werden:", Track)
+		StopHelikopter()
+		return
+	end
 
-    if not Success or not Result then
-        warn("[Catploit] Helikopter-Animation konnte nicht geladen werden:", Result)
-        StopHelikopter()
-        return
-    end
+	HelikopterTrack = Track
+	HelikopterTrack.Priority = Enum.AnimationPriority.Action
+	HelikopterTrack.Looped = true
+	HelikopterRunning = true
 
-    HelikopterTrack = Result
-    HelikopterTrack.Priority = Enum.AnimationPriority.Action
-    HelikopterTrack.Looped = true
+	local PlaySuccess, PlayError = pcall(function()
+		HelikopterTrack:Play(0.1, 1, 1)
+	end)
 
-    local PlaySuccess, PlayError = pcall(function()
-        HelikopterTrack:Play(0.15, 1, 1)
-    end)
+	if not PlaySuccess then
+		warn("[Catploit] Helikopter konnte nicht abgespielt werden:", PlayError)
+		StopHelikopter()
+		return
+	end
 
-    if not PlaySuccess then
-        warn("[Catploit] Helikopter konnte nicht abgespielt werden:", PlayError)
-        StopHelikopter()
-        return
-    end
-
-    print("[Catploit] Helikopter läuft auf workspace.Camera.BaseRig")
+	print("[Catploit] Helikopter gestartet: workspace.Camera.BaseRig")
 end
 
 Groupboxes.Fun:AddButton({
-    Text = "Helikopter",
-    Func = function()
-        PlayHelikopter()
-    end,
-    DoubleClick = false,
-    Tooltip = "Spielt das Helikopter-Emote dauerhaft auf BaseRig ab."
+	Text = "Helikopter",
+	Func = function()
+		PlayHelikopter()
+	end,
+	DoubleClick = false,
+	Tooltip = "Spielt die Helikopter-Animation dauerhaft auf workspace.Camera.BaseRig."
 })
 
 Groupboxes.Fun:AddButton({
-    Text = "Stop Helikopter",
-    Func = function()
-        StopHelikopter()
-    end,
-    DoubleClick = false,
-    Tooltip = "Stoppt das Helikopter-Emote auf BaseRig."
+	Text = "Stop Helikopter",
+	Func = function()
+		StopHelikopter()
+	end,
+	DoubleClick = false,
+	Tooltip = "Stoppt die Helikopter-Animation."
 })
+
+task.spawn(function()
+	while true do
+		task.wait(1)
+
+		if HelikopterRunning then
+			if not HelikopterTrack or not HelikopterTrack.IsPlaying then
+				PlayHelikopter()
+			end
+		end
+	end
+end)
 
 -- Stairwell
 
@@ -2939,11 +2965,40 @@ Toggles.RemoveJamminMusic:OnChanged(function(Value)
 	end
 end)
 Toggles.RemoveInteractingSounds:OnChanged(function(Value)
-	local PS = Globals.MainUI.Initiator.Main_Game.PromptService
-	PS.Triggered.Volume   = Value and 0 or 0.04
-	PS.Holding.Volume     = Value and 0 or 0.1
-	PS.Notification.Volume = Value and 0 or 0.03
-	Globals.MainUI.Initiator.Main_Game.Reminder.Caption.Volume = Value and 0 or 0.1
+	local MainGame = Globals.MainUI
+		and Globals.MainUI.Initiator
+		and Globals.MainUI.Initiator:FindFirstChild("Main_Game")
+
+	if not MainGame then
+		return
+	end
+
+	local PromptService = MainGame:FindFirstChild("PromptService")
+	if PromptService then
+		local Triggered = PromptService:FindFirstChild("Triggered")
+		local Holding = PromptService:FindFirstChild("Holding")
+		local Notification = PromptService:FindFirstChild("Notification")
+
+		if Triggered and Triggered:IsA("Sound") then
+			Triggered.Volume = Value and 0 or 0.04
+		end
+
+		if Holding and Holding:IsA("Sound") then
+			Holding.Volume = Value and 0 or 0.1
+		end
+
+		if Notification and Notification:IsA("Sound") then
+			Notification.Volume = Value and 0 or 0.03
+		end
+	end
+
+	local Reminder = MainGame:FindFirstChild("Reminder")
+	local Caption = Reminder and Reminder:FindFirstChild("Caption")
+	local CaptionSound = Caption and Caption:FindFirstChildOfClass("Sound")
+
+	if CaptionSound then
+		CaptionSound.Volume = Value and 0 or 0.1
+	end
 end)
 
 Groupboxes.Visuals_LeftTab = Tabs.Visuals:AddLeftTabbox("Camera / Effects")
