@@ -135,6 +135,44 @@ local HonchoCorrectBoxConnection = nil
 local HonchoProcessedRooms = {}
 local HonchoESPObjects = {}
 
+-- Fun
+
+Groupboxes.Fun = Tabs.Fun:AddLeftGroupbox("Fun")
+
+Groupboxes.Fun:AddButton({
+    Text = "FlipFun",
+    Func = function()
+        local character = LocalPlayer and LocalPlayer.Character
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+
+        if not humanoid then
+            return
+        end
+
+        local animator = humanoid:FindFirstChildOfClass("Animator")
+        if not animator then
+            animator = Instance.new("Animator")
+            animator.Parent = humanoid
+        end
+
+        local animation = Instance.new("Animation")
+        animation.AnimationId = "rbxassetid://106139974500165"
+
+        local track = animator:LoadAnimation(animation)
+        track.Priority = Enum.AnimationPriority.Action
+        track:Play()
+
+        task.delay(10, function()
+            if track and track.IsPlaying then
+                track:Stop()
+            end
+            animation:Destroy()
+        end)
+    end,
+    DoubleClick = false,
+    Tooltip = "Plays the FlipFun emote."
+})
+
 -- Stairwell locals
 
 
@@ -1238,6 +1276,7 @@ local Tabs = {
 	Floors   = Window:AddTab("Floors", "earth"),
 	Archives  = Window:AddTab("Archives", "rbxassetid://104508835882225"),
 	Stairwell = Window:AddTab("Stairwell", "rbxassetid://80017304328364"),
+	Fun = Window:AddTab("Fun", "smile"),
 }
 
 Groupboxes.General_Character = Tabs.General:AddLeftGroupbox("Character")
@@ -2452,77 +2491,30 @@ end)
 
 Groupboxes.Stairwell_Misc = Tabs.Stairwell:AddLeftGroupbox("Exploits / Anti")
 Groupboxes.Stairwell_Experimental = Tabs.Stairwell:AddLeftGroupbox("Experimental")
-local function BringAllDroppedItems()
-    local workspaceDropsFolder = workspace:FindFirstChild("Drops")
-    local character = LocalPlayer and LocalPlayer.Character
-    local playerHumanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
-
-    if not playerHumanoidRootPart or not workspaceDropsFolder then
-        return
-    end
-
-    for _, itemToBring in ipairs(workspaceDropsFolder:GetChildren()) do
-        if itemToBring:IsA("Model") then
-            itemToBring:PivotTo(playerHumanoidRootPart.CFrame)
-        elseif itemToBring:IsA("BasePart") then
-            itemToBring.CFrame = playerHumanoidRootPart.CFrame
-        end
-    end
-end
-
 Groupboxes.Stairwell_Experimental:AddButton({
     Text = "Bring Dropped Items",
-    Func = BringAllDroppedItems,
+    Func = function()
+        local workspaceDropsFolder = workspace:FindFirstChild("Drops")
+
+        if LocalPlayer and LocalPlayer.Character then
+            local playerHumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            
+            if playerHumanoidRootPart then
+                if workspaceDropsFolder then
+                    for _, itemToBring in ipairs(workspaceDropsFolder:GetChildren()) do
+                        if itemToBring:IsA("Model") then
+                            itemToBring:PivotTo(playerHumanoidRootPart.CFrame)
+                        elseif itemToBring:IsA("BasePart") then
+                            itemToBring.CFrame = playerHumanoidRootPart.CFrame
+                        end
+                    end
+                end
+            end
+        end
+    end,
     DoubleClick = false,
     Tooltip = "Brings all dropped items."
 })
-
-local AutoBringInterval = 5
-local AutoBringRunning = false
-
-Groupboxes.Stairwell_Experimental:AddSlider("AutoBringInterval", {
-    Text = "Bring Items Interval",
-    Min = 1,
-    Max = 60,
-    Default = 5,
-    Rounding = 0,
-    Compact = true
-})
-
-Groupboxes.Stairwell_Experimental:AddToggle("AutoBringDroppedItems", {
-    Text = "Auto Bring Dropped Items",
-    Default = false,
-    Tooltip = "Automatically brings all dropped items."
-})
-
-Toggles.AutoBringDroppedItems:OnChanged(function(enabled)
-    if not enabled or AutoBringRunning then
-        return
-    end
-
-    AutoBringRunning = true
-
-    task.spawn(function()
-        while Toggles.AutoBringDroppedItems.Value do
-            BringAllDroppedItems()
-
-            local interval = 5
-            if Options.AutoBringInterval then
-                interval = tonumber(Options.AutoBringInterval.Value) or 5
-            end
-
-            if interval < 1 then
-                interval = 1
-            elseif interval > 60 then
-                interval = 60
-            end
-
-            task.wait(interval)
-        end
-
-        AutoBringRunning = false
-    end)
-end)
 
 Groupboxes.Stairwell_Experimental:AddToggle("AntiNoise", { Text = "Anti Noise", Default = false, Tooltip = "Prevents the game from making noise when moving (Visual studio auto ai lmfao ✌)." })
 
