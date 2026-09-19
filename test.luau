@@ -2459,7 +2459,7 @@ local HelikopterAnimation = nil
 local function StopHelikopter()
     if HelikopterTrack then
         pcall(function()
-            HelikopterTrack:Stop(0)
+            HelikopterTrack:Stop(0.15)
             HelikopterTrack:Destroy()
         end)
         HelikopterTrack = nil
@@ -2476,68 +2476,91 @@ end
 local function PlayHelikopter()
     StopHelikopter()
 
-    local character = LocalPlayer and LocalPlayer.Character
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then
+    local Camera = workspace:FindFirstChild("Camera")
+    if not Camera then
+        warn("[Catploit] workspace.Camera wurde nicht gefunden.")
         return
     end
 
-    local animator = humanoid:FindFirstChildOfClass("Animator")
-    if not animator then
-        animator = Instance.new("Animator")
-        animator.Parent = humanoid
+    local BaseRig = Camera:FindFirstChild("BaseRig")
+    if not BaseRig then
+        warn("[Catploit] workspace.Camera.BaseRig wurde nicht gefunden.")
+        return
+    end
+
+    local Humanoid = BaseRig:FindFirstChildOfClass("Humanoid")
+    local Animator = nil
+
+    if Humanoid then
+        Animator = Humanoid:FindFirstChildOfClass("Animator")
+
+        if not Animator then
+            Animator = Instance.new("Animator")
+            Animator.Parent = Humanoid
+        end
+    else
+        local AnimationController = BaseRig:FindFirstChildOfClass("AnimationController")
+
+        if not AnimationController then
+            AnimationController = Instance.new("AnimationController")
+            AnimationController.Parent = BaseRig
+        end
+
+        Animator = AnimationController:FindFirstChildOfClass("Animator")
+
+        if not Animator then
+            Animator = Instance.new("Animator")
+            Animator.Parent = AnimationController
+        end
     end
 
     HelikopterAnimation = Instance.new("Animation")
+    HelikopterAnimation.Name = "HelikopterAnimation"
     HelikopterAnimation.AnimationId = "rbxassetid://264717068888449"
 
-    local success, track = pcall(function()
-        return animator:LoadAnimation(HelikopterAnimation)
+    local Success, Result = pcall(function()
+        return Animator:LoadAnimation(HelikopterAnimation)
     end)
 
-    if not success or not track then
+    if not Success or not Result then
+        warn("[Catploit] Helikopter-Animation konnte nicht geladen werden:", Result)
         StopHelikopter()
         return
     end
 
-    HelikopterTrack = track
+    HelikopterTrack = Result
     HelikopterTrack.Priority = Enum.AnimationPriority.Action
     HelikopterTrack.Looped = true
-    HelikopterTrack:Play(0.1, 1, 1)
+
+    local PlaySuccess, PlayError = pcall(function()
+        HelikopterTrack:Play(0.15, 1, 1)
+    end)
+
+    if not PlaySuccess then
+        warn("[Catploit] Helikopter konnte nicht abgespielt werden:", PlayError)
+        StopHelikopter()
+        return
+    end
+
+    print("[Catploit] Helikopter läuft auf workspace.Camera.BaseRig")
 end
 
-Groupboxes.Fun:AddToggle("Helikopter", {
+Groupboxes.Fun:AddButton({
     Text = "Helikopter",
-    Default = false,
-    Tooltip = "Spielt das Helikopter-Emote dauerhaft ab."
+    Func = function()
+        PlayHelikopter()
+    end,
+    DoubleClick = false,
+    Tooltip = "Spielt das Helikopter-Emote dauerhaft auf BaseRig ab."
 })
-
-Toggles.Helikopter:OnChanged(function(Value)
-    if Value then
-        PlayHelikopter()
-    else
-        StopHelikopter()
-    end
-end)
-
-LocalPlayer.CharacterAdded:Connect(function()
-    if Toggles.Helikopter and Toggles.Helikopter.Value then
-        task.wait(0.5)
-        PlayHelikopter()
-    end
-end)
 
 Groupboxes.Fun:AddButton({
     Text = "Stop Helikopter",
     Func = function()
-        if Toggles.Helikopter then
-            Toggles.Helikopter:SetValue(false)
-        else
-            StopHelikopter()
-        end
+        StopHelikopter()
     end,
     DoubleClick = false,
-    Tooltip = "Stoppt das Helikopter-Emote."
+    Tooltip = "Stoppt das Helikopter-Emote auf BaseRig."
 })
 
 -- Stairwell
