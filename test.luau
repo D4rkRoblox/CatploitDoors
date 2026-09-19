@@ -135,97 +135,6 @@ local HonchoCorrectBoxConnection = nil
 local HonchoProcessedRooms = {}
 local HonchoESPObjects = {}
 
--- Fun
-
-Groupboxes.Fun = Tabs.Fun:AddLeftGroupbox("Fun")
-
-local HelikopterTrack = nil
-local HelikopterAnimation = nil
-
-local function StopHelikopter()
-    if HelikopterTrack then
-        pcall(function()
-            HelikopterTrack:Stop(0)
-            HelikopterTrack:Destroy()
-        end)
-        HelikopterTrack = nil
-    end
-
-    if HelikopterAnimation then
-        pcall(function()
-            HelikopterAnimation:Destroy()
-        end)
-        HelikopterAnimation = nil
-    end
-end
-
-local function PlayHelikopter()
-    StopHelikopter()
-
-    local character = LocalPlayer and LocalPlayer.Character
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then
-        return
-    end
-
-    local animator = humanoid:FindFirstChildOfClass("Animator")
-    if not animator then
-        animator = Instance.new("Animator")
-        animator.Parent = humanoid
-    end
-
-    HelikopterAnimation = Instance.new("Animation")
-    HelikopterAnimation.AnimationId = "rbxassetid://264717068888449"
-
-    local success, track = pcall(function()
-        return animator:LoadAnimation(HelikopterAnimation)
-    end)
-
-    if not success or not track then
-        StopHelikopter()
-        return
-    end
-
-    HelikopterTrack = track
-    HelikopterTrack.Priority = Enum.AnimationPriority.Action
-    HelikopterTrack.Looped = true
-    HelikopterTrack:Play(0.1, 1, 1)
-end
-
-Groupboxes.Fun:AddToggle("Helikopter", {
-    Text = "Helikopter",
-    Default = false,
-    Tooltip = "Spielt das Helikopter-Emote dauerhaft ab."
-})
-
-Toggles.Helikopter:OnChanged(function(Value)
-    if Value then
-        PlayHelikopter()
-    else
-        StopHelikopter()
-    end
-end)
-
-LocalPlayer.CharacterAdded:Connect(function()
-    if Toggles.Helikopter and Toggles.Helikopter.Value then
-        task.wait(0.5)
-        PlayHelikopter()
-    end
-end)
-
-Groupboxes.Fun:AddButton({
-    Text = "Stop Helikopter",
-    Func = function()
-        if Toggles.Helikopter then
-            Toggles.Helikopter:SetValue(false)
-        else
-            StopHelikopter()
-        end
-    end,
-    DoubleClick = false,
-    Tooltip = "Stoppt das Helikopter-Emote."
-})
-
 -- Stairwell locals
 
 
@@ -2539,6 +2448,97 @@ Toggles.BypassDrones:OnChanged(function(Value)
 	end
 end)
 
+
+-- Fun
+
+Groupboxes.Fun = Tabs.Fun:AddLeftGroupbox("Fun")
+
+local HelikopterTrack = nil
+local HelikopterAnimation = nil
+
+local function StopHelikopter()
+    if HelikopterTrack then
+        pcall(function()
+            HelikopterTrack:Stop(0)
+            HelikopterTrack:Destroy()
+        end)
+        HelikopterTrack = nil
+    end
+
+    if HelikopterAnimation then
+        pcall(function()
+            HelikopterAnimation:Destroy()
+        end)
+        HelikopterAnimation = nil
+    end
+end
+
+local function PlayHelikopter()
+    StopHelikopter()
+
+    local character = LocalPlayer and LocalPlayer.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then
+        return
+    end
+
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if not animator then
+        animator = Instance.new("Animator")
+        animator.Parent = humanoid
+    end
+
+    HelikopterAnimation = Instance.new("Animation")
+    HelikopterAnimation.AnimationId = "rbxassetid://264717068888449"
+
+    local success, track = pcall(function()
+        return animator:LoadAnimation(HelikopterAnimation)
+    end)
+
+    if not success or not track then
+        StopHelikopter()
+        return
+    end
+
+    HelikopterTrack = track
+    HelikopterTrack.Priority = Enum.AnimationPriority.Action
+    HelikopterTrack.Looped = true
+    HelikopterTrack:Play(0.1, 1, 1)
+end
+
+Groupboxes.Fun:AddToggle("Helikopter", {
+    Text = "Helikopter",
+    Default = false,
+    Tooltip = "Spielt das Helikopter-Emote dauerhaft ab."
+})
+
+Toggles.Helikopter:OnChanged(function(Value)
+    if Value then
+        PlayHelikopter()
+    else
+        StopHelikopter()
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    if Toggles.Helikopter and Toggles.Helikopter.Value then
+        task.wait(0.5)
+        PlayHelikopter()
+    end
+end)
+
+Groupboxes.Fun:AddButton({
+    Text = "Stop Helikopter",
+    Func = function()
+        if Toggles.Helikopter then
+            Toggles.Helikopter:SetValue(false)
+        else
+            StopHelikopter()
+        end
+    end,
+    DoubleClick = false,
+    Tooltip = "Stoppt das Helikopter-Emote."
+})
 
 -- Stairwell
 
