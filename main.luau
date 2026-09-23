@@ -2574,14 +2574,12 @@ Groupboxes.Exploits_BypassRight:AddDivider()
 Groupboxes.Exploits_BypassRight:AddToggle("InfiniteItemsToggle", {
 	Text = "Infinite Items", Default = false,
 	Tooltip = "Allows certain items to be used without draining their uses.",
-	Disabled = not Functions.CheckCompatability({"fireproximityprompt"}),
 	DisabledTooltip = Globals.IncompatibleMessage
 })
 Groupboxes.Exploits_BypassRight:AddDropdown("InfiniteItemsList", {
 	Text = "Item List",
 	Values = { "Lockpicks", "Skeleton Key", "Shears", "Multitool" },
 	Multi = true, AllowNull = true,
-	Disabled = not Functions.CheckCompatability({"fireproximityprompt"}),
 	DisabledTooltip = Globals.IncompatibleMessage
 })
 
